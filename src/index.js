@@ -135,7 +135,6 @@ app.post("/session", (req, res) => {
   const sessid = req.body.sessid;
   const language = req.body.language;
   const languageExt = req.body.languageExt;
-  const languageExt = req.body.languageExt;
 
   let code = "";
 
