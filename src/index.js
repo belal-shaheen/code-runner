@@ -136,19 +136,13 @@ app.post("/session", (req, res) => {
   const language = req.body.language;
   const languageExt = req.body.languageExt;
 
-  fs.mkdir(
-    `src/${language}/src/${req.body.sessid}`,
-    { recursive: true },
-    (x) => {
-      fs.writeFile(
-        `src/${language}/src/${req.body.sessid}/main.${languageExt}`,
-        code,
-        (err) => {
-          if (err) console.log(err);
-        }
-      );
-    }
-  );
+  const dir = `src/${language}/src/${req.body.sessid}`;
+
+  fs.mkdir(dir, { recursive: true }, (x) => {
+    fs.writeFile(`${dir}/main.${languageExt}`, code, (err) => {
+      if (err) console.log(err);
+    });
+  });
   sessionId = uuidv4();
   console.log("asdf");
 
@@ -161,7 +155,7 @@ app.post("/session", (req, res) => {
       } else {
         console.log("hello");
         const javaRun = process.spawn(
-          `docker run --name ${sessionId} --memory="256m" -v asdfasdfqwe:/home ${sessid}`,
+          `docker run --name ${sessionId} --timeout="" --memory="256m" -v asdfasdfqwe:/home ${sessid}`,
           [],
           { shell: true }
         );
@@ -189,6 +183,13 @@ app.post("/session", (req, res) => {
         });
 
         javaRun.on("close", () => {
+          fs.rmdir(dir, { recursive: true }, (err) => {
+            if (err) {
+              console.log(err);
+            }
+
+            console.log(`${dir} is deleted!`);
+          });
           res.send("done");
           return;
         });
