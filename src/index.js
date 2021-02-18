@@ -155,7 +155,7 @@ app.post("/session", (req, res) => {
       } else {
         console.log("hello");
         const javaRun = process.spawn(
-          `docker run --name ${sessionId} --timeout="" --memory="256m" -v asdfasdfqwe:/home ${sessid}`,
+          `docker run --name ${sessionId} timeout 40 --memory="256m" -v asdfasdfqwe:/home ${sessid}`,
           [],
           { shell: true }
         );
