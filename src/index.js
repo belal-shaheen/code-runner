@@ -185,7 +185,7 @@ app.post("/session", (req, res) => {
         javaRun.on("close", () => {
           fs.rmdir(dir, { recursive: true }, (err) => {
             if (err) {
-              console.log(err);
+              throw err;
             }
 
             console.log(`${dir} is deleted!`);
