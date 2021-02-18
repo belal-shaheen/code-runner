@@ -131,16 +131,10 @@ app.post("/stop", (req, res) => {
 
 app.post("/session", (req, res) => {
   if (req.body.sessid === undefined) return;
-  const langCode = req.body.code;
+  const code = req.body.code;
   const sessid = req.body.sessid;
   const language = req.body.language;
   const languageExt = req.body.languageExt;
-
-  let code = "";
-
-  for (let i = 0; i < langCode.length; i++) {
-    code += langCode[i] + "\n";
-  }
 
   fs.mkdir(
     `src/${language}/src/${req.body.sessid}`,
