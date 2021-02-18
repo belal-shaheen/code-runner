@@ -11,6 +11,7 @@ const PNG = require("pngjs").PNG;
 const { fstat } = require("fs");
 const fs = require("fs");
 const { Buffer } = require("buffer");
+const rmdir = require("rimraf");
 
 const app = express();
 app.use(bodyParser.json());
@@ -155,7 +156,7 @@ app.post("/session", (req, res) => {
       } else {
         console.log("hello");
         const javaRun = process.spawn(
-          `docker run --name ${sessionId} timeout 40 --memory="256m" -v asdfasdfqwe:/home ${sessid}`,
+          `docker run --name ${sessionId} --stop-timeout	 --memory="256m" -v asdfasdfqwe:/home ${sessid}`,
           [],
           { shell: true }
         );
@@ -183,12 +184,8 @@ app.post("/session", (req, res) => {
         });
 
         javaRun.on("close", () => {
-          fs.rmdir(dir, { recursive: true }, (err) => {
-            if (err) {
-              throw err;
-            }
-
-            console.log(`${dir} is deleted!`);
+          rmdir(dir, function (error) {
+            console.log(error);
           });
           res.send("done");
           return;
