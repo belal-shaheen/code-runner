@@ -131,8 +131,6 @@ app.post("/stop", (req, res) => {
   });
 });
 
-let shell = "bash";
-
 app.post("/session", (req, res) => {
   if (req.body.sessid === undefined) return;
   const code = req.body.code;
@@ -158,32 +156,19 @@ app.post("/session", (req, res) => {
         console.log(error);
       } else {
         console.log("hello");
-
-        const langProcess = pty.spawn(shell, [], {
-          name: "xterm-color",
-          cols: 80,
-          rows: 80,
-          cwd: process.env.HOME,
-          env: process.env,
-        });
-
-        langProcess.write(
-          `docker run --name ${sessionId} --stop-timeout 30 --memory="134217728" -v asdfasdfqwe:/home ${sessid}`
+        const javaRun = process.spawn(
+          `docker run --name ${sessionId} --stop-timeout 30 --memory="134217728" -v asdfasdfqwe:/home ${sessid}`,
+          [],
+          { shell: true }
         );
-
-        // const javaRun = process.spawn(
-        //   `docker run --name ${sessionId} --stop-timeout 30 --memory="134217728" -v asdfasdfqwe:/home ${sessid}`,
-        //   [],
-        //   { shell: true }
-        // );
         if (req.body.socketId) {
           io.to(req.body.socketId).emit("running", true);
         }
 
-        langProcess.onData((data) => {
+        javaRun.stderr.on("data", function (data) {
           if (req.body.socketId) {
             // console.log(data.toString());
-            io.to(req.body.socketId).emit("output", data);
+            io.to(req.body.socketId).emit("output", data.toString());
           }
         });
 
@@ -193,27 +178,19 @@ app.post("/session", (req, res) => {
           });
         }
 
-        // javaRun.stdout.on("data", function (data) {
-        //   if (req.body.socketId) {
-        //     io.to(req.body.socketId).emit("output", data.toString());
-        //   }
-        // });
+        javaRun.stdout.on("data", function (data) {
+          if (req.body.socketId) {
+            io.to(req.body.socketId).emit("output", data.toString());
+          }
+        });
 
-        langProcess.onExit((exit) => {
+        javaRun.on("close", () => {
           rmdir(dir, function (error) {
             console.log(error);
           });
           res.send("done");
           return;
         });
-
-        // javaRun.on("close", () => {
-        //   rmdir(dir, function (error) {
-        //     console.log(error);
-        //   });
-        //   res.send("done");
-        //   return;
-        // });
       }
     }
   );
