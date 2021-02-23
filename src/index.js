@@ -7,6 +7,7 @@ const http = require("http");
 const { v4: uuidv4 } = require("uuid");
 const rfb = require("rfb2");
 const PNG = require("pngjs").PNG;
+var pty = require("node-pty");
 
 const { fstat } = require("fs");
 const fs = require("fs");
@@ -130,6 +131,8 @@ app.post("/stop", (req, res) => {
   });
 });
 
+let shell = "bash";
+
 app.post("/session", (req, res) => {
   if (req.body.sessid === undefined) return;
   const code = req.body.code;
@@ -155,19 +158,32 @@ app.post("/session", (req, res) => {
         console.log(error);
       } else {
         console.log("hello");
-        const javaRun = process.spawn(
-          `docker run --name ${sessionId} --stop-timeout 30 --memory="134217728" -v asdfasdfqwe:/home ${sessid}`,
-          [],
-          { shell: true }
+
+        const langProcess = pty.spawn(shell, [], {
+          name: "xterm-color",
+          cols: 80,
+          rows: 80,
+          cwd: process.env.HOME,
+          env: process.env,
+        });
+
+        langProcess.write(
+          `docker run --name ${sessionId} --stop-timeout 30 --memory="134217728" -v asdfasdfqwe:/home ${sessid}`
         );
+
+        // const javaRun = process.spawn(
+        //   `docker run --name ${sessionId} --stop-timeout 30 --memory="134217728" -v asdfasdfqwe:/home ${sessid}`,
+        //   [],
+        //   { shell: true }
+        // );
         if (req.body.socketId) {
           io.to(req.body.socketId).emit("running", true);
         }
 
-        javaRun.stderr.on("data", function (data) {
+        langProcess.onData((data) => {
           if (req.body.socketId) {
             // console.log(data.toString());
-            io.to(req.body.socketId).emit("output", data.toString());
+            io.to(req.body.socketId).emit("output", data);
           }
         });
 
@@ -177,19 +193,27 @@ app.post("/session", (req, res) => {
           });
         }
 
-        javaRun.stdout.on("data", function (data) {
-          if (req.body.socketId) {
-            io.to(req.body.socketId).emit("output", data.toString());
-          }
-        });
+        // javaRun.stdout.on("data", function (data) {
+        //   if (req.body.socketId) {
+        //     io.to(req.body.socketId).emit("output", data.toString());
+        //   }
+        // });
 
-        javaRun.on("close", () => {
+        langProcess.onExit((exit) => {
           rmdir(dir, function (error) {
             console.log(error);
           });
           res.send("done");
           return;
         });
+
+        // javaRun.on("close", () => {
+        //   rmdir(dir, function (error) {
+        //     console.log(error);
+        //   });
+        //   res.send("done");
+        //   return;
+        // });
       }
     }
   );
