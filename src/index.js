@@ -149,7 +149,7 @@ app.post("/session", (req, res) => {
   console.log("asdf");
 
   process.exec(
-    `docker build -f src/${language}/Dockerfile -t ${sessid} . --build-arg sessid=${sessid} main=${mainEntry}`,
+    `docker build -f src/${language}/Dockerfile -t ${sessid} . --build-arg sessid=${sessid} --build-arg  main=${mainEntry}`,
     function (error, stdout, stderr) {
       if (error) {
         res.send(stderr);
