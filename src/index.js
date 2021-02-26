@@ -7,7 +7,6 @@ const http = require("http");
 const { v4: uuidv4 } = require("uuid");
 const rfb = require("rfb2");
 const PNG = require("pngjs").PNG;
-var pty = require("node-pty");
 
 const { fstat } = require("fs");
 const fs = require("fs");
@@ -168,7 +167,7 @@ app.post("/session", (req, res) => {
         javaRun.stderr.on("data", function (data) {
           if (req.body.socketId) {
             // console.log(data.toString());
-            io.to(req.body.socketId).emit("output", data.toString());
+            io.to(req.body.socketId).emit("error", data.toString());
           }
         });
 
