@@ -136,11 +136,12 @@ app.post("/session", (req, res) => {
   const sessid = req.body.sessid;
   const language = req.body.language;
   const languageExt = req.body.languageExt;
+  const mainEntry = req.body.mainEntry;
 
   const dir = `src/${language}/src/${req.body.sessid}`;
 
   fs.mkdir(dir, { recursive: true }, (x) => {
-    fs.writeFile(`${dir}/main.${languageExt}`, code, (err) => {
+    fs.writeFile(`${dir}/${mainEntry}.${languageExt}`, code, (err) => {
       if (err) console.log(err);
     });
   });
@@ -148,7 +149,7 @@ app.post("/session", (req, res) => {
   console.log("asdf");
 
   process.exec(
-    `docker build -f src/${language}/Dockerfile -t ${sessid} . --build-arg sessid=${sessid}`,
+    `docker build -f src/${language}/Dockerfile -t ${sessid} . --build-arg sessid=${sessid} main=${mainEntry}`,
     function (error, stdout, stderr) {
       if (error) {
         res.send(stderr);
