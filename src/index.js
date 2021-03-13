@@ -186,9 +186,9 @@ app.post("/session", (req, res) => {
         });
 
         javaRun.on("close", () => {
-          rmdir(dir, function (error) {
-            console.log(error);
-          });
+          // rmdir(dir, function (error) {
+          //   console.log(error);
+          // });
           res.send("done");
           return;
         });
