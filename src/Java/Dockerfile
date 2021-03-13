@@ -3,7 +3,7 @@ ARG sessid
 ARG main
 COPY ./src/Java/src/${sessid}/${main}.java /usr/app/
 WORKDIR /usr/app
-RUN echo "#!/bin/bash \n ls" > ./entrypoint.sh
+RUN echo "#!/bin/bash \n cd /usr/app \n ls" > ./entrypoint.sh
 RUN chmod +x ./entrypoint.sh
 ENTRYPOINT ["sh", "./entrypoint.sh"]
 
