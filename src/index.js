@@ -31,7 +31,7 @@ const io = socketIo(server, {
   },
 });
 
-const port = 3000;
+const port = 4000;
 
 const available_docker = [];
 let clients = [];
@@ -149,7 +149,7 @@ app.post("/session", (req, res) => {
   console.log("asdf");
 
   process.exec(
-    `docker build -f src/${language}/Dockerfile -t ${sessid} . --build-arg sessid=${sessid} --build-arg  main=${mainEntry}`,
+    `docker build -f src/${language}/Dockerfile -t ${sessid} . --build-arg sessid=${sessid} --build-arg main=${mainEntry}`,
     function (error, stdout, stderr) {
       if (error) {
         res.send(stderr);
@@ -179,6 +179,7 @@ app.post("/session", (req, res) => {
         }
 
         javaRun.stdout.on("data", function (data) {
+          console.log(data);
           if (req.body.socketId) {
             io.to(req.body.socketId).emit("output", data.toString());
           }

@@ -1,8 +1,10 @@
 FROM java:8-jdk-alpine
 ARG sessid
-COPY ./src/Java/src/${sessid}/${main}.java /usr/app/
+ARG mainentry
+COPY ./src/Java/src/${sessid}/${mainentry}.java /usr/app/
 WORKDIR /usr/app
-RUN javac ${main}.java
-ENTRYPOINT ["java", HelloWorld]
+RUN javac ${mainentry}.java
+COPY ${mainentry} main.class
+ENTRYPOINT [ "java", "main"]
 
 
