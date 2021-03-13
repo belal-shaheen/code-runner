@@ -5,5 +5,5 @@ COPY ./src/Java/src/${sessid}/${main}.java /usr/app/
 WORKDIR /usr/app
 RUN echo "#!/bin/bash \n ls" > ./entrypoint.sh
 RUN chmod +x ./entrypoint.sh
-ENTRYPOINT ["./entrypoint.sh"]
+ENTRYPOINT ["sh", "./entrypoint.sh"]
 
