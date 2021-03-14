@@ -26,7 +26,6 @@ let sessionId = "";
 
 const server = http.createServer(app);
 const io = socketIo(server, {
-  transports: ["websocket"],
   cors: {
     origin: "*",
   },
