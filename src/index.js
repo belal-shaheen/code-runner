@@ -147,7 +147,6 @@ app.post("/session", (req, res) => {
   });
   sessionId = uuidv4();
   console.log("asdf");
-  "docker build -f src/Java/Dockerfile -t asdfasdf . --build-arg sessid=asdfasdf --build-arg main=HelloWorld"`docker run --name asdfasdf --stop-timeout 30 --memory="134217728" -v asdfasdfqwe:/home asdfasdf`;
   process.exec(
     `docker build -f src/${language}/Dockerfile -t ${sessid} . --build-arg sessid=${sessid} --build-arg main=${mainEntry}`,
     function (error, stdout, stderr) {
