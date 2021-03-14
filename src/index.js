@@ -179,7 +179,7 @@ app.post("/session", (req, res) => {
         }
 
         javaRun.stdout.on("data", function (data) {
-          console.log(data);
+          console.log(data.toString());
           if (req.body.socketId) {
             io.to(req.body.socketId).emit("output", data.toString());
           }
