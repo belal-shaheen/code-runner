@@ -31,7 +31,7 @@ const io = socketIo(server, {
   },
 });
 
-const port = 3000;
+const port = 4000;
 
 const available_docker = [];
 let clients = [];
@@ -147,7 +147,7 @@ app.post("/session", (req, res) => {
   });
   sessionId = uuidv4();
   console.log("asdf");
-
+  "docker build -f src/Java/Dockerfile -t asdfasdf . --build-arg sessid=asdfasdf --build-arg main=HelloWorld"`docker run --name asdfasdf --stop-timeout 30 --memory="134217728" -v asdfasdfqwe:/home asdfasdf`;
   process.exec(
     `docker build -f src/${language}/Dockerfile -t ${sessid} . --build-arg sessid=${sessid} --build-arg main=${mainEntry}`,
     function (error, stdout, stderr) {
@@ -157,7 +157,7 @@ app.post("/session", (req, res) => {
       } else {
         console.log("hello");
         const javaRun = process.spawn(
-          `docker run --name ${sessionId} --stop-timeout 30 --memory="134217728" -v asdfasdfqwe:/home ${sessid}`,
+          `docker run --name ${sessionId} --stop-timeout 30 --memory="134217728" ${sessid}`,
           [],
           { shell: true }
         );
