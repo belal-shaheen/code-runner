@@ -137,6 +137,7 @@ app.post("/session", (req, res) => {
   const language = req.body.language;
   const languageExt = req.body.languageExt;
   const mainEntry = req.body.mainEntry;
+  const socketId = req.body.socketId;
 
   const dir = `src/${language}/src/${req.body.sessid}`;
 
@@ -146,7 +147,7 @@ app.post("/session", (req, res) => {
     });
   });
   sessionId = uuidv4();
-  console.log("asdf");
+  console.log(socketId);
   process.exec(
     `docker build -f src/${language}/Dockerfile -t ${sessid} . --build-arg sessid=${sessid} --build-arg main=${mainEntry}`,
     function (error, stdout, stderr) {
@@ -160,27 +161,27 @@ app.post("/session", (req, res) => {
           [],
           { shell: true }
         );
-        if (req.body.socketId) {
-          io.to(req.body.socketId).emit("running", true);
+        if (socketId) {
+          io.to(socketId).emit("running", true);
         }
 
         javaRun.stderr.on("data", function (data) {
-          if (req.body.socketId) {
+          if (socketId) {
             // console.log(data.toString());
-            io.to(req.body.socketId).emit("error", data.toString());
+            io.to(socketId).emit("error", data.toString());
           }
         });
 
-        if (req.body.socketId) {
-          io.sockets.in(req.body.socketId).on("input", (input) => {
+        if (socketId) {
+          io.sockets.in(socketId).on("input", (input) => {
             console.log(input);
           });
         }
 
         javaRun.stdout.on("data", function (data) {
           console.log(data.toString());
-          if (req.body.socketId) {
-            io.to(req.body.socketId).emit("output", data.toString());
+          if (socketId) {
+            io.to(socketId).emit("output", data.toString());
           }
         });
 
