@@ -110,6 +110,8 @@ io.on("connection", (socket) => {
     const languageExt = codeObject.languageExt;
     const mainEntry = codeObject.mainEntry;
 
+    const dir = `src/${language}/src/${req.body.sessid}`;
+
     fs.mkdir(dir, { recursive: true }, (x) => {
       fs.writeFile(`${dir}/${mainEntry}.${languageExt}`, code, (err) => {
         if (err) console.log(err);
