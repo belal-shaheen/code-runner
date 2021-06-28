@@ -108,7 +108,7 @@ io.on("connection", (socket) => {
 
 io.on("session", (data) => {
   const codeObject = JSON.parse(data);
-  if (codeObject.sessid === undefined) return;
+  if (codeObject.sessid === undefined) console.log(codeObject);
   const code = codeObject.code;
   const sessid = codeObject.sessid;
   const language = codeObject.language;
@@ -119,8 +119,6 @@ io.on("session", (data) => {
   console.log(code)
   console.log(sessid)
   console.log(sessid)
-  
-
 })
 
 app.post("/stop", (req, res) => {
