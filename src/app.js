@@ -112,7 +112,6 @@ io.on("connection", (socket) => {
   socket.emit("connection:sid", socket.id);
   socket.on("disconnect", () => {
     console.log("Client disconnected");
-    // disconnectClient(socket);
   });
 });
 
@@ -197,6 +196,4 @@ app.post("/session", (req, res) => {
   );
 });
 
-server.listen(port, () =>
-  console.log(`Hello world app listening on port ${port}!`)
-);
+module.exports = server;
