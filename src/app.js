@@ -6,7 +6,6 @@ const socketIo = require("socket.io");
 const http = require("http");
 const { v4: uuidv4 } = require("uuid");
 const rfb = require("rfb2");
-const PNG = require("pngjs").PNG;
 
 const { fstat } = require("fs");
 const fs = require("fs");
