@@ -101,7 +101,7 @@ io.on("connection", (socket) => {
 
   socket.emit("connection:sid", socket.id);
 
-  io.on("session", (data) => {
+  socket.on("session", (data) => {
     const codeObject = JSON.parse(data);
     if (codeObject.sessid === undefined) console.log(codeObject);
     const code = codeObject.code;
