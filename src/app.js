@@ -119,7 +119,6 @@ io.on("connection", (socket) => {
     });
 
     sessionId = uuidv4();
-    console.log(socketId);
     process.exec(
       `docker build -f src/${language}/Dockerfile -t ${sessid} . --build-arg sessid=${sessid} --build-arg main=${mainEntry}`,
       function (error, stdout, stderr) {
