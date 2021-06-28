@@ -98,21 +98,30 @@ const createRfbConnection = (config, socket) => {
 
 io.on("connection", (socket) => {
   console.log("connection established");
-  socket.on("init", function (config) {
-    var r = createRfbConnection(config, socket);
-    socket.on("mouse", function (evnt) {
-      r.pointerEvent(evnt.x, evnt.y, evnt.button);
-    });
-    socket.on("keyboard", function (evnt) {
-      r.keyEvent(evnt.keyCode, evnt.isDown);
-    });
-  });
 
   socket.emit("connection:sid", socket.id);
   socket.on("disconnect", () => {
     console.log("Client disconnected");
   });
+
 });
+
+io.on("session", (data) => {
+  const codeObject = JSON.parse(data);
+  if (codeObject.sessid === undefined) return;
+  const code = codeObject.code;
+  const sessid = codeObject.sessid;
+  const language = codeObject.language;
+  const languageExt = codeObject.languageExt;
+  const mainEntry = codeObject.mainEntry;
+  const socketId = codeObject.socketId;
+
+  console.log(code)
+  console.log(sessid)
+  console.log(sessid)
+  
+
+})
 
 app.post("/stop", (req, res) => {
   if (req.body.sessid === undefined) return;
@@ -127,6 +136,8 @@ app.post("/stop", (req, res) => {
     res.send(stdout);
   });
 });
+
+
 
 app.post("/session", (req, res) => {
   if (req.body.sessid === undefined) return;
@@ -144,6 +155,8 @@ app.post("/session", (req, res) => {
       if (err) console.log(err);
     });
   });
+  //docker build -f src/Java/Dockerfile -t asdfasdf . --build-arg sessid=asdfasdf --build-arg main=HelloWorld
+  //docker run --name asdfasdf --stop-timeout 30 --memory="134217728" asdfasdf
   sessionId = uuidv4();
   console.log(socketId);
   process.exec(
