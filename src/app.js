@@ -103,24 +103,72 @@ io.on("connection", (socket) => {
 
   socket.on("session", (data) => {
     const codeObject = JSON.parse(data);
-    if (codeObject.sessid === undefined) console.log(codeObject);
+    if (codeObject.sessid === undefined) return;
     const code = codeObject.code;
     const sessid = codeObject.sessid;
     const language = codeObject.language;
     const languageExt = codeObject.languageExt;
     const mainEntry = codeObject.mainEntry;
-    const socketId = codeObject.socketId;
 
-    console.log(code)
-    console.log(sessid)
-    console.log(sessid)
-  })
+    fs.mkdir(dir, { recursive: true }, (x) => {
+      fs.writeFile(`${dir}/${mainEntry}.${languageExt}`, code, (err) => {
+        if (err) console.log(err);
+      });
+    });
+
+    sessionId = uuidv4();
+    console.log(socketId);
+    process.exec(
+      `docker build -f src/${language}/Dockerfile -t ${sessid} . --build-arg sessid=${sessid} --build-arg main=${mainEntry}`,
+      function (error, stdout, stderr) {
+        if (error) {
+          res.send(stderr);
+          console.log(error);
+        } else {
+          const javaRun = process.spawn(
+            `docker run --name ${sessionId} --stop-timeout 30 --memory="134217728" ${sessid}`,
+            [],
+            { shell: true }
+          );
+          if (socketId) {
+            socket.emit("running", true);
+          }
+
+          javaRun.stderr.on("data", function (data) {
+            if (socketId) {
+              // console.log(data.toString());
+              socket.emit("error", data);
+            }
+          });
+
+          // if (socketId) {
+          //   io.sockets.in(socketId).on("input", (input) => {
+          //     console.log(input);
+          //   });
+          // }
+
+          javaRun.stdout.on("data", function (data) {
+            // console.log(data.toString());
+            if (socketId) {
+              socket.emit("output", data);
+            }
+          });
+
+          javaRun.on("close", () => {
+            rmdir(dir, function (error) {
+              console.log(error);
+            });
+            socket.emit("close");
+            return;
+          });
+        }
+      }
+    );
+  });
   socket.on("disconnect", () => {
     console.log("Client disconnected");
   });
-
 });
-
 
 app.post("/stop", (req, res) => {
   if (req.body.sessid === undefined) return;
@@ -135,8 +183,6 @@ app.post("/stop", (req, res) => {
     res.send(stdout);
   });
 });
-
-
 
 app.post("/session", (req, res) => {
   if (req.body.sessid === undefined) return;
