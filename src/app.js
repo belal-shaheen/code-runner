@@ -100,26 +100,27 @@ io.on("connection", (socket) => {
   console.log("connection established");
 
   socket.emit("connection:sid", socket.id);
+
+  io.on("session", (data) => {
+    const codeObject = JSON.parse(data);
+    if (codeObject.sessid === undefined) console.log(codeObject);
+    const code = codeObject.code;
+    const sessid = codeObject.sessid;
+    const language = codeObject.language;
+    const languageExt = codeObject.languageExt;
+    const mainEntry = codeObject.mainEntry;
+    const socketId = codeObject.socketId;
+
+    console.log(code)
+    console.log(sessid)
+    console.log(sessid)
+  })
   socket.on("disconnect", () => {
     console.log("Client disconnected");
   });
 
 });
 
-io.on("session", (data) => {
-  const codeObject = JSON.parse(data);
-  if (codeObject.sessid === undefined) console.log(codeObject);
-  const code = codeObject.code;
-  const sessid = codeObject.sessid;
-  const language = codeObject.language;
-  const languageExt = codeObject.languageExt;
-  const mainEntry = codeObject.mainEntry;
-  const socketId = codeObject.socketId;
-
-  console.log(code)
-  console.log(sessid)
-  console.log(sessid)
-})
 
 app.post("/stop", (req, res) => {
   if (req.body.sessid === undefined) return;
