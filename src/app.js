@@ -131,9 +131,9 @@ io.on("connection", (socket) => {
             [],
             { shell: true }
           );
-          if (socketId) {
-            socket.emit("running", true);
-          }
+          
+          socket.emit("running", true);
+
 
           javaRun.stderr.on("data", function (data) {
             if (socketId) {
