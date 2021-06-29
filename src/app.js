@@ -136,10 +136,8 @@ io.on("connection", (socket) => {
 
 
           javaRun.stderr.on("data", function (data) {
-            if (socketId) {
               // console.log(data.toString());
               socket.emit("error", data);
-            }
           });
 
           // if (socketId) {
