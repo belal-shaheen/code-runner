@@ -131,7 +131,7 @@ io.on("connection", (socket) => {
             [],
             { shell: true }
           );
-          
+
           socket.emit("running", true);
 
 
@@ -150,9 +150,7 @@ io.on("connection", (socket) => {
 
           javaRun.stdout.on("data", function (data) {
             // console.log(data.toString());
-            if (socketId) {
-              socket.emit("output", data);
-            }
+            socket.emit("output", data);
           });
 
           javaRun.on("close", () => {
