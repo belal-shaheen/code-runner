@@ -118,6 +118,8 @@ io.on("connection", (socket) => {
       });
     });
 
+    socket.emit("running", true);
+
     sessionId = uuidv4();
     process.exec(
       `docker build -f src/${language}/Dockerfile -t ${sessid} . --build-arg sessid=${sessid} --build-arg main=${mainEntry}`,
@@ -132,7 +134,6 @@ io.on("connection", (socket) => {
             { shell: true }
           );
 
-          socket.emit("running", true);
 
 
           javaRun.stderr.on("data", function (data) {
