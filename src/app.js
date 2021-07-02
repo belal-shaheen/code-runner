@@ -126,7 +126,8 @@ io.on("connection", (socket) => {
       function (error, stdout, stderr) {
         if (error) {
           socket.emit("error", stderr);
-          console.log("errir", error);
+          console.log("error", error);
+          console.log("stderror", stderr);
         } else {
           const javaRun = process.spawn(
             `docker run --name ${sessionId} --stop-timeout 30 --memory="134217728" ${sessid}`,
