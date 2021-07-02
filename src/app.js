@@ -126,7 +126,7 @@ io.on("connection", (socket) => {
       function (error, stdout, stderr) {
         if (error) {
           socket.emit("error", stdout);
-          // console.log("error", stdout);
+          console.log("error", stdout);
           // console.log("stderror", stderr);
         } else {
           const javaRun = process.spawn(
