@@ -125,12 +125,12 @@ io.on("connection", (socket) => {
       `docker build -f src/${language}/Dockerfile -t ${sessid} . --build-arg sessid=${sessid} --build-arg main=${mainEntry}`,
       function (error, stdout, stderr) {
         if (error) {
-          socket.emit("error", stderr);
-          console.log("error", stdout);
-          console.log("stderror", stderr);
+          socket.emit("error", stdout);
+          // console.log("error", stdout);
+          // console.log("stderror", stderr);
         } else {
           const javaRun = process.spawn(
-            `docker run --name ${sessionId} --stop-timeout 30 --memory="134217728" ${sessid}`,
+            `docker run --name ${sessionId} --stop-timeout 30 ${sessid}`,
             [],
             { shell: true }
           );
