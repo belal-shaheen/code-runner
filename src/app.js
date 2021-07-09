@@ -6,6 +6,7 @@ const socketIo = require("socket.io");
 const http = require("http");
 const { v4: uuidv4 } = require("uuid");
 const rfb = require("rfb2");
+const Pty = require("node-pty");
 
 const { fstat } = require("fs");
 const fs = require("fs");
@@ -121,26 +122,42 @@ io.on("connection", (socket) => {
     socket.emit("running", true);
 
     sessionId = uuidv4();
+
     process.exec(
       `docker build -f src/${language}/Dockerfile -t ${sessid} . --build-arg sessid=${sessid} --build-arg main=${mainEntry}`,
       function (error, stdout, stderr) {
         if (error) {
-          socket.emit("error", stdout);
           console.log("error", stdout);
+          socket.emit("error", stdout);
           // console.log("stderror", stderr);
         } else {
-          const javaRun = process.spawn(
-            `docker run --name ${sessionId} --stop-timeout 30 ${sessid}`,
-            [],
-            { shell: true }
+          // const javaRun = process.spawn(
+          //   `docker run --name ${sessionId} --stop-timeout 30 ${sessid}`,
+          //   [],
+          //   { shell: true }
+          // );
+
+          let processclient = Pty.spawn("/bin/bash", [], {
+            name: "xterm-color",
+            cols: 80,
+            rows: 24,
+            cwd: process.env.PWD,
+            env: process.env,
+          });
+
+          processclient.write(
+            `docker run --name ${sessionId} --stop-timeout 30 ${sessid}`
           );
 
-
-
-          javaRun.stderr.on("data", function (data) {
-              // console.log(data.toString());
-              socket.emit("error", data);
+          processclient.onData((data) => {
+            console.log(data);
+            socket.emit("output", data);
           });
+
+          // javaRun.stderr.on("data", function (data) {
+          //   // console.log(data.toString());
+          //   socket.emit("error", data);
+          // });
 
           // if (socketId) {
           //   io.sockets.in(socketId).on("input", (input) => {
@@ -148,18 +165,25 @@ io.on("connection", (socket) => {
           //   });
           // }
 
-          javaRun.stdout.on("data", function (data) {
-            // console.log(data.toString());
-            socket.emit("output", data);
-          });
+          // javaRun.stdout.on("data", function (data) {
+          //   // console.log(data.toString());
+          //   socket.emit("output", data);
+          // });
 
-          javaRun.on("close", () => {
+          processclient.onExit("close", () => {
             rmdir(dir, function (error) {
               console.log(error);
             });
             socket.emit("close");
             return;
           });
+          // javaRun.on("close", () => {
+          //   rmdir(dir, function (error) {
+          //     console.log(error);
+          //   });
+          //   socket.emit("close");
+          //   return;
+          // });
         }
       }
     );
