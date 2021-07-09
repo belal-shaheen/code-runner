@@ -137,16 +137,16 @@ io.on("connection", (socket) => {
           //   { shell: true }
           // );
 
-          let processclient = Pty.spawn("/bin/bash", [], {
+          let processclient = Pty.spawn("docker", ["run", "--name", `${sessionId}`, "--stop-timeout", "30", `${sessid}`], {
             name: "xterm-color",
             cols: 80,
             rows: 24,
             env: process.env,
           });
 
-          processclient.write(
-            `docker run --name ${sessionId} --stop-timeout 30 ${sessid} \r`
-          );
+          // processclient.write(
+          //   `docker run --name ${sessionId} --stop-timeout 30 ${sessid} \r`
+          // );
 
           processclient.onData((data) => {
             console.log(data);
