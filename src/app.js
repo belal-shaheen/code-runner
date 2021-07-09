@@ -153,6 +153,15 @@ io.on("connection", (socket) => {
             socket.emit("output", data);
           });
 
+          socket.on("input", (data) => {
+            processclient.write(data);
+          })
+
+          socket.on("disconnect", function(){
+            processclient.destroy();
+            console.log("bye");
+         });
+
           // javaRun.stderr.on("data", function (data) {
           //   // console.log(data.toString());
           //   socket.emit("error", data);
