@@ -141,7 +141,6 @@ io.on("connection", (socket) => {
             name: "xterm-color",
             cols: 80,
             rows: 24,
-            cwd: process.cwd(),
             env: process.env,
           });
 
