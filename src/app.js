@@ -158,10 +158,10 @@ io.on("connection", (socket) => {
             processclient.write(data);
           })
 
-          socket.on("disconnect", function(){
-            processclient.destroy();
-            console.log("bye");
-         });
+        //   socket.on("disconnect", function(){
+        //     processclient.destroy();
+        //     console.log("bye");
+        //  });
 
           // javaRun.stderr.on("data", function (data) {
           //   // console.log(data.toString());
