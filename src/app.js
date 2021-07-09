@@ -145,7 +145,7 @@ io.on("connection", (socket) => {
           });
 
           processclient.write(
-            `docker run --name ${sessionId} --stop-timeout 30 ${sessid}`
+            `docker run --name ${sessionId} --stop-timeout 30 ${sessid} \r`
           );
 
           processclient.onData((data) => {
