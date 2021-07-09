@@ -154,6 +154,7 @@ io.on("connection", (socket) => {
           });
 
           socket.on("input", (data) => {
+            console.log(input)
             processclient.write(data);
           })
 
