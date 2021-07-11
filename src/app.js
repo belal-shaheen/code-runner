@@ -144,6 +144,7 @@ io.on("connection", (socket) => {
         env: process.env,
       }
     );
+    console.log('Working '); // add one line.
 
     buildClient.on("error", err => {
       console.error(err);
