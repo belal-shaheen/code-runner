@@ -188,7 +188,6 @@ io.on("connection", (socket) => {
               console.log(error);
             });
             socket.emit("close");
-            return;
           });
           // javaRun.on("close", () => {
           //   rmdir(dir, function (error) {
