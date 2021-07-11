@@ -122,6 +122,7 @@ io.on("connection", (socket) => {
     socket.emit("running", true);
 
     sessionId = uuidv4();
+    //docker build -f src/${language}/Dockerfile -t ${sessid} . --build-arg sessid=${sessid} --build-arg main=${mainEntry}
     let buildClient = Pty.spawn(
       "docker",
       [
@@ -131,6 +132,7 @@ io.on("connection", (socket) => {
         `-t`,
         `${sessid}`,
         ".",
+        "--build-arg",
         `sessid=${sessid}`,
         "--build-arg",
         `main=${mainEntry}`,
