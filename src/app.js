@@ -122,83 +122,127 @@ io.on("connection", (socket) => {
     socket.emit("running", true);
 
     sessionId = uuidv4();
-    //docker build -f src/Java/Dockerfile -t asdfasdf . --build-arg sessid=asdfasdf --build-arg main=HelloWorld
-    process.exec(
-      `docker build -f src/${language}/Dockerfile -t ${sessid} . --build-arg sessid=${sessid} --build-arg main=${mainEntry}`,
-      function (error, stdout, stderr) {
-        if (error) {
-          console.log("error", stdout);
-          console.log("error", stderr);
-          console.log("sth went wrong here")
-          socket.emit("error", error);
-          socket.emit("close");
-          // console.log("stderror", stderr);
-        } else {
-          // const javaRun = process.spawn(
-          //   `docker run --name ${sessionId} --stop-timeout 30 ${sessid}`,
-          //   [],
-          //   { shell: true }
-          // );
+    let buildClient = Pty.spawn(
+      "docker",
+      [
+        "build",
+        "-f",
+        `src/${language}/Dockerfile`,
+        `-t`,
+        `${sessid}`,
+        ".",
+        `sessid=${sessid}`,
+        "--build-arg",
+        `main=${mainEntry}`,
+      ],
+      {
+        name: "xterm-color",
+        cols: 80,
+        rows: 24,
+        env: process.env,
+      }
+    );
 
-          let processclient = Pty.spawn("docker", ["run", "-it", "--name", `${sessionId}`, "--stop-timeout", "30", `${sessid}`], {
+    buildClient.on("error", err => {
+      socket.emit("error", err);
+      socket.emit("close");
+    })
+
+    buildClient.on("exit", code => {
+      if (code == 0) {
+        let processclient = Pty.spawn(
+          "docker",
+          [
+            "run",
+            "-it",
+            "--name",
+            `${sessionId}`,
+            "--stop-timeout",
+            "30",
+            `${sessid}`,
+          ],
+          {
             name: "xterm-color",
             cols: 80,
             rows: 24,
             env: process.env,
-          });
+          }
+        );
 
-          // processclient.write(
-          //   `docker run --name ${sessionId} --stop-timeout 30 ${sessid} \r`
-          // );
+        // processclient.write(
+        //   `docker run --name ${sessionId} --stop-timeout 30 ${sessid} \r`
+        // );
 
-          processclient.onData((data) => {
-            console.log(data);
-            socket.emit("output", data);
-          });
+        processclient.onData((data) => {
+          console.log(data);
+          socket.emit("output", data);
+        });
 
-          socket.on("input", (data) => {
-            console.log(data)
-            processclient.write(data);
-          })
+        socket.on("input", (data) => {
+          console.log(data);
+          processclient.write(data);
+        });
 
         //   socket.on("disconnect", function(){
         //     processclient.destroy();
         //     console.log("bye");
         //  });
 
-          // javaRun.stderr.on("data", function (data) {
-          //   // console.log(data.toString());
-          //   socket.emit("error", data);
-          // });
+        // javaRun.stderr.on("data", function (data) {
+        //   // console.log(data.toString());
+        //   socket.emit("error", data);
+        // });
 
-          // if (socketId) {
-          //   io.sockets.in(socketId).on("input", (input) => {
-          //     console.log(input);
-          //   });
-          // }
+        // if (socketId) {
+        //   io.sockets.in(socketId).on("input", (input) => {
+        //     console.log(input);
+        //   });
+        // }
 
-          // javaRun.stdout.on("data", function (data) {
-          //   // console.log(data.toString());
-          //   socket.emit("output", data);
-          // });
+        // javaRun.stdout.on("data", function (data) {
+        //   // console.log(data.toString());
+        //   socket.emit("output", data);
+        // });
 
-          processclient.onExit("close", () => {
-            rmdir(dir, function (error) {
-              console.log(error);
-            });
-            socket.emit("close");
-            return;
+        processclient.onExit("close", () => {
+          rmdir(dir, function (error) {
+            console.log(error);
           });
-          // javaRun.on("close", () => {
-          //   rmdir(dir, function (error) {
-          //     console.log(error);
-          //   });
-          //   socket.emit("close");
-          //   return;
-          // });
-        }
+          socket.emit("close");
+          return;
+        });
+        // javaRun
       }
-    );
+    })
+
+    //docker build -f src/Java/Dockerfile -t asdfasdf . --build-arg sessid=asdfasdf --build-arg main=HelloWorld
+    // process.exec(
+    //   `docker build -f src/${language}/Dockerfile -t ${sessid} . --build-arg sessid=${sessid} --build-arg main=${mainEntry}`,
+    //   function (error, stdout, stderr) {
+    //     if (error) {
+    //       console.log("error", stdout);
+    //       console.log("error", stderr);
+    //       console.log("sth went wrong here");
+    //       socket.emit("error", error);
+    //       socket.emit("close");
+    //       // console.log("stderror", stderr);
+    //     } else {
+    //       // const javaRun = process.spawn(
+    //       //   `docker run --name ${sessionId} --stop-timeout 30 ${sessid}`,
+    //       //   [],
+    //       //   { shell: true }
+    //       // );
+
+    //      .on("close", () => {
+    //       //   rmdir(dir, function (error) {
+    //       //     console.log(error);
+    //       //   });
+    //       //   socket.emit("close");
+    //       //   return;
+    //       // });
+    //     }
+    //   }
+    // );
   });
   socket.on("disconnect", () => {
     console.log("Client disconnected");
