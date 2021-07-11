@@ -130,7 +130,7 @@ io.on("connection", (socket) => {
           console.log("error", stdout);
           console.log("error", stderr);
           console.log("sth went wrong here")
-          socket.emit("error", stdout);
+          socket.emit("error", stderr);
           // console.log("stderror", stderr);
         } else {
           // const javaRun = process.spawn(
