@@ -128,6 +128,7 @@ io.on("connection", (socket) => {
       function (error, stdout, stderr) {
         if (error) {
           console.log("error", stdout);
+          console.log("error", stderr);
           console.log("sth went wrong here")
           socket.emit("error", stdout);
           // console.log("stderror", stderr);
