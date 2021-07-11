@@ -183,7 +183,7 @@ io.on("connection", (socket) => {
           //   socket.emit("output", data);
           // });
 
-          processclient.onExit("close", () => {
+          processclient.on("exit", () => {
             rmdir(dir, function (error) {
               console.log(error);
             });
