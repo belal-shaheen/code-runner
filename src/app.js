@@ -122,137 +122,84 @@ io.on("connection", (socket) => {
     socket.emit("running", true);
 
     sessionId = uuidv4();
-    //docker build -f src/${language}/Dockerfile -t ${sessid} . --build-arg sessid=${sessid} --build-arg main=${mainEntry}
-    let buildClient = Pty.spawn(
-      "docker",
-      [
-        "build",
-        "-f",
-        `src/${language}/Dockerfile`,
-        `-t`,
-        `${sessid}`,
-        ".",
-        "--build-arg",
-        `sessid=${sessid}`,
-        "--build-arg",
-        `main=${mainEntry}`,
-      ],
-      {
-        name: "xterm-color",
-        cols: 80,
-        rows: 24,
-        env: process.env,
-      }
-    );
-    console.log('Working '); // add one line.
 
-    buildClient.on("error", err => {
-      buildClient.on('data', function(data) {
-        socket.emit("error", data);
-      });
-      console.error(err);
-      socket.emit("close");
-    })
+    //docker build -f src/Java/Dockerfile -t asdfasdf . --build-arg sessid=asdfasdf --build-arg main=HelloWorld
+    process.exec(
+      `docker build -f src/${language}/Dockerfile -t ${sessid} . --build-arg sessid=${sessid} --build-arg main=${mainEntry}`,
+      function (error, stdout, stderr) {
+        if (error) {
+          console.log("error", stdout);
+          console.log("error", stderr);
+          console.log("sth went wrong here")
+          socket.emit("error", stdout);
+          socket.emit("close");
+          // console.log("stderror", stderr);
+        } else {
+          // const javaRun = process.spawn(
+          //   `docker run --name ${sessionId} --stop-timeout 30 ${sessid}`,
+          //   [],
+          //   { shell: true }
+          // );
 
-  
-
-    buildClient.on("exit", code => {
-      console.log(code)
-      if (code == 0) {
-        console.log("running")
-        let processclient = Pty.spawn(
-          "docker",
-          [
-            "run",
-            "-it",
-            "--name",
-            `${sessionId}`,
-            "--stop-timeout",
-            "30",
-            `${sessid}`,
-          ],
-          {
+          let processclient = Pty.spawn("docker", ["run", "-it", "--name", `${sessionId}`, "--stop-timeout", "30", `${sessid}`], {
             name: "xterm-color",
             cols: 80,
             rows: 24,
             env: process.env,
-          }
-        );
+          });
 
-        // processclient.write(
-        //   `docker run --name ${sessionId} --stop-timeout 30 ${sessid} \r`
-        // );
+          // processclient.write(
+          //   `docker run --name ${sessionId} --stop-timeout 30 ${sessid} \r`
+          // );
 
-        processclient.onData((data) => {
-          console.log(data);
-          socket.emit("output", data);
-        });
+          processclient.onData((data) => {
+            console.log(data);
+            socket.emit("output", data);
+          });
 
-        socket.on("input", (data) => {
-          console.log(data);
-          processclient.write(data);
-        });
+          socket.on("input", (data) => {
+            console.log(data)
+            processclient.write(data);
+          })
 
         //   socket.on("disconnect", function(){
         //     processclient.destroy();
         //     console.log("bye");
         //  });
 
-        // javaRun.stderr.on("data", function (data) {
-        //   // console.log(data.toString());
-        //   socket.emit("error", data);
-        // });
+          // javaRun.stderr.on("data", function (data) {
+          //   // console.log(data.toString());
+          //   socket.emit("error", data);
+          // });
 
-        // if (socketId) {
-        //   io.sockets.in(socketId).on("input", (input) => {
-        //     console.log(input);
-        //   });
-        // }
+          // if (socketId) {
+          //   io.sockets.in(socketId).on("input", (input) => {
+          //     console.log(input);
+          //   });
+          // }
 
-        // javaRun.stdout.on("data", function (data) {
-        //   // console.log(data.toString());
-        //   socket.emit("output", data);
-        // });
+          // javaRun.stdout.on("data", function (data) {
+          //   // console.log(data.toString());
+          //   socket.emit("output", data);
+          // });
 
-        processclient.onExit("close", () => {
-          rmdir(dir, function (error) {
-            console.log(error);
+          processclient.onExit("close", () => {
+            rmdir(dir, function (error) {
+              console.log(error);
+            });
+            socket.emit("close");
+            return;
           });
-          socket.emit("close");
-          return;
-        });
-        // javaRun
+          // javaRun.on("close", () => {
+          //   rmdir(dir, function (error) {
+          //     console.log(error);
+          //   });
+          //   socket.emit("close");
+          //   return;
+          // });
+        }
       }
-    })
-
-    //docker build -f src/Java/Dockerfile -t asdfasdf . --build-arg sessid=asdfasdf --build-arg main=HelloWorld
-    // process.exec(
-    //   `docker build -f src/${language}/Dockerfile -t ${sessid} . --build-arg sessid=${sessid} --build-arg main=${mainEntry}`,
-    //   function (error, stdout, stderr) {
-    //     if (error) {
-    //       console.log("error", stdout);
-    //       console.log("error", stderr);
-    //       console.log("sth went wrong here");
-    //       socket.emit("error", error);
-    //       socket.emit("close");
-    //       // console.log("stderror", stderr);
-    //     } else {
-    //       // const javaRun = process.spawn(
-    //       //   `docker run --name ${sessionId} --stop-timeout 30 ${sessid}`,
-    //       //   [],
-    //       //   { shell: true }
-    //       // );
-
-    //      .on("close", () => {
-    //       //   rmdir(dir, function (error) {
-    //       //     console.log(error);
-    //       //   });
-    //       //   socket.emit("close");
-    //       //   return;
-    //       // });
-    //     }
-    //   }
-    // );
+    );
   });
   socket.on("disconnect", () => {
     console.log("Client disconnected");
