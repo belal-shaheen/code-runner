@@ -122,12 +122,13 @@ io.on("connection", (socket) => {
     socket.emit("running", true);
 
     sessionId = uuidv4();
-
+    //docker build -f src/Java/Dockerfile -t asdfasdf . --build-arg sessid=asdfasdf --build-arg main=HelloWorld
     process.exec(
       `docker build -f src/${language}/Dockerfile -t ${sessid} . --build-arg sessid=${sessid} --build-arg main=${mainEntry}`,
       function (error, stdout, stderr) {
         if (error) {
           console.log("error", stdout);
+          console.log("sth went wrong here")
           socket.emit("error", stdout);
           // console.log("stderror", stderr);
         } else {
