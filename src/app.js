@@ -144,12 +144,15 @@ io.on("connection", (socket) => {
     );
 
     buildClient.on("error", err => {
+      console.error(err);
       socket.emit("error", err);
       socket.emit("close");
     })
 
     buildClient.on("exit", code => {
+      console.log(code)
       if (code == 0) {
+        console.log("running")
         let processclient = Pty.spawn(
           "docker",
           [
