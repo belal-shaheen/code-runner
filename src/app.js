@@ -147,8 +147,7 @@ io.on("connection", (socket) => {
     console.log('Working '); // add one line.
 
     buildClient.on("error", err => {
-      ptyProcess.on('data', function(data) {
-        ptyProcess.write('\n');
+      buildClient.on('data', function(data) {
         socket.emit("error", data);
       });
       console.error(err);
