@@ -123,7 +123,8 @@ io.on("connection", (socket) => {
 
     sessionId = uuidv4();
 
-    //docker build -f src/Java/Dockerfile -t asdfasdf . --build-arg sessid=asdfasdf --build-arg main=HelloWorld
+    //docker build -f src/Java/Dockerfile -t f9b340d3-4f7e-4c75-8e80-49d7e8f1946d . --build-arg sessid=f9b340d3-4f7e-4c75-8e80-49d7e8f1946d --build-arg main=HelloWorld
+    //docker build -f src/${language}/Dockerfile -t ${sessid} . --build-arg sessid=${sessid} --build-arg main=${mainEntry}
     process.exec(
       `docker build -f src/${language}/Dockerfile -t ${sessid} . --build-arg sessid=${sessid} --build-arg main=${mainEntry}`,
       function (error, stdout, stderr) {
@@ -142,12 +143,15 @@ io.on("connection", (socket) => {
           //   { shell: true }
           // );
 
-          let processclient = Pty.spawn("docker", ["run", "-it", "--name", `${sessionId}`, "--stop-timeout", "30", `${sessid}`], {
+          let processclient = Pty.spawn("docker", ["run", "-it", "--name", `${sessionId}`, "--rm", "--stop-timeout", "30", `${sessid}`], {
             name: "xterm-color",
             cols: 80,
             rows: 24,
             env: process.env,
           });
+          // docker run -it --name f9b340d3-4f7e-4c75-8e80-49d7e8f1946d --stop-timeout 30 f9b340d3-4f7e-4c75-8e80-49d7e8f1946d
+          //f9b340d3-4f7e-4c75-8e80-49d7e8f1946d
+          //fae59b37-b229-478a-9113-7ac2eb87994a
 
           // processclient.write(
           //   `docker run --name ${sessionId} --stop-timeout 30 ${sessid} \r`
