@@ -143,7 +143,7 @@ io.on("connection", (socket) => {
           //   { shell: true }
           // );
 
-          let processclient = Pty.spawn("docker", ["run", "-it", `--memory="16m"`, "--name", `${sessionId}`, "--rm", "--stop-timeout", "30", `${sessid}`], {
+          let processclient = Pty.spawn("docker", ["run", "-it", '--memory="16m"', "--name", `${sessionId}`, "--rm", "--stop-timeout", "30", `${sessid}`], {
             name: "xterm-color",
             cols: 80,
             rows: 24,
